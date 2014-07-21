@@ -1,5 +1,5 @@
 /*
-cDR Skynet Arduino mqtt module
+cDR Skynet Arduino mqtt gateway, with extra gratis locking interrupt (need help)
 */
 
 #include <SPI.h>
