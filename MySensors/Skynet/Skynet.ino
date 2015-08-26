@@ -6,7 +6,7 @@
 
 // project
 #define SN "Skynet"
-#define SV "1.8.3"
+#define SV "1.9.0"
 
 // children
 #define CHILD_ID_HUM 0
@@ -65,7 +65,7 @@ MyMessage msgSound(CHILD_ID_SOUND, V_VOLUME);
 
 void setup()
 {
-  gw.begin(NULL, 2);
+  gw.begin(NULL);
   gw.sendSketchInfo(SN, SV);
 
   metric = gw.getConfig().isMetric;
