@@ -29,7 +29,7 @@ MyMessage msgReceive(CHILD_ID_RF433_RECEIVER, V_IR_SEND);
 MyMessage msgTransmit(CHILD_ID_RF433_TRANSMITTER, V_VAR1);
 
 void setup() {
-  gw.begin(incomingMessage, 1);
+  gw.begin(incomingMessage);
   gw.sendSketchInfo(SN, SV);
   gw.present(CHILD_ID_RF433_RECEIVER, S_IR);
   gw.present(CHILD_ID_RF433_TRANSMITTER, S_IR);
