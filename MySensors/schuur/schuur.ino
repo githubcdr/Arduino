@@ -30,7 +30,7 @@
 #include <SPI.h>
 #include <MySensor.h>  
 #include <Wire.h>
-#include <Adafruit_BMP085.h>
+#include <SFE_BMP180.h>
 #include <DHT.h>  
 
 #define BARO_CHILD 0
@@ -59,7 +59,7 @@ enum FORECAST
   UNKNOWN = 5     // "Unknown (More Time needed)
 };
 
-Adafruit_BMP085 bmp = Adafruit_BMP085();      // Digital Pressure Sensor 
+SFE_BMP180 pressure;      // Digital Pressure Sensor 
 MySensor gw;
 
 DHT dht;
@@ -102,7 +102,7 @@ void setup()
   // Send the sketch version information to the gateway and Controller
   gw.sendSketchInfo("Schuur", "1.2");
 
-  if (!bmp.begin()) 
+  if (!pressure.begin()) 
   {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
