@@ -6,7 +6,7 @@
 
 // project
 #define SN "Skynet"
-#define SV "1.9.0"
+#define SV "1.9.1"
 
 // children
 #define CHILD_ID_HUM 0
@@ -67,19 +67,29 @@ void setup()
 {
   gw.begin(NULL);
   gw.sendSketchInfo(SN, SV);
+  gw.wait(200);
 
   metric = gw.getConfig().isMetric;
 
   // Register all sensors to gw (they will be created as child devices)
   gw.present(CHILD_ID_HUM, S_HUM);
+  gw.wait(100);
   gw.present(CHILD_ID_TEMP, S_TEMP);
+  gw.wait(100);
   gw.present(CHILD_ID_LIGHT, S_LIGHT_LEVEL);
+  gw.wait(100);
   gw.present(CHILD_ID_IS_DARK, S_LIGHT);
+  gw.wait(100);
   gw.present(CHILD_ID_MOTION, S_MOTION);
+  gw.wait(100);
   gw.present(CHILD_ID_MOISTURE, S_CUSTOM);
+  gw.wait(100);
   gw.present(CHILD_ID_UV, S_UV);
+  gw.wait(100);
   gw.present(CHILD_ID_BARO, S_BARO);
+  gw.wait(100);
   gw.present(CHILD_ID_SOUND, S_POWER);
+  
 
   dht.setup(HUMIDITY_SENSOR_DIGITAL_PIN);
   bmp.begin();
