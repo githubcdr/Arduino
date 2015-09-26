@@ -6,7 +6,7 @@
 
 // project
 #define SN "Skynet"
-#define SV "1.9.1"
+#define SV "1.9.2"
 
 // children
 #define CHILD_ID_HUM 0
@@ -65,7 +65,7 @@ MyMessage msgSound(CHILD_ID_SOUND, V_VOLUME);
 
 void setup()
 {
-  gw.begin(NULL);
+  gw.begin(NULL, AUTO, true);
   gw.sendSketchInfo(SN, SV);
   gw.wait(200);
 
@@ -176,7 +176,9 @@ void loop()
     lastPressure = pressure;
   }
 
-  gw.sleep(INTERRUPT, CHANGE, SLEEP_TIME); //sleep a bit
+  gw.wait(5000);
+  gw.process();
+  //gw.sleep(INTERRUPT, CHANGE, SLEEP_TIME); //sleep a bit
   //gw.sleep(SLEEP_TIME); //sleep a bit
 }
 
