@@ -1,3 +1,13 @@
+// Enable debug prints to serial monitor
+//#define MY_DEBUG
+
+// Enable and select radio type attached
+#define MY_RADIO_NRF24
+//#define MY_RADIO_RFM69
+
+// Enable repeater functionality for this node
+//#define MY_REPEATER_FEATURE
+
 #include <SPI.h>
 #include <MySensor.h>
 #include <DHT.h>
@@ -6,7 +16,7 @@
 
 // project
 #define SN "Skynet"
-#define SV "1.9.2"
+#define SV "2.0.1"
 
 // children
 #define CHILD_ID_HUM 0
@@ -23,12 +33,10 @@
 #define MOTION_SENSOR_DIGITAL_PIN 3
 #define HUMIDITY_SENSOR_DIGITAL_PIN 4
 #define LIGHT_SENSOR_DIGITAL_PIN 5
-
 #define LIGHT_SENSOR_ANALOG_PIN 0
 #define SOIL_SENSOR_ANALOG_PIN 1
 #define UV_SENSOR_ANALOG_PIN 2
 #define SOUND_SENSOR_ANALOG_PIN 6
-
 #define INTERRUPT MOTION_SENSOR_DIGITAL_PIN-2
 
 // misc
@@ -52,7 +60,7 @@ DHT dht;
 unsigned long SLEEP_TIME = 60000;
 Adafruit_BMP085 bmp = Adafruit_BMP085();
 
-MySensor gw;
+//MySensor gw;
 MyMessage msgHum(CHILD_ID_HUM, V_HUM);
 MyMessage msgTemp(CHILD_ID_TEMP, V_TEMP);
 MyMessage msgLight(CHILD_ID_LIGHT, V_LIGHT_LEVEL);
@@ -65,37 +73,24 @@ MyMessage msgSound(CHILD_ID_SOUND, V_VOLUME);
 
 void setup()
 {
-  gw.begin(NULL, AUTO, true);
-  gw.sendSketchInfo(SN, SV);
-  gw.wait(200);
-
-  metric = gw.getConfig().isMetric;
-
-  // Register all sensors to gw (they will be created as child devices)
-  gw.present(CHILD_ID_HUM, S_HUM);
-  gw.wait(100);
-  gw.present(CHILD_ID_TEMP, S_TEMP);
-  gw.wait(100);
-  gw.present(CHILD_ID_LIGHT, S_LIGHT_LEVEL);
-  gw.wait(100);
-  gw.present(CHILD_ID_IS_DARK, S_LIGHT);
-  gw.wait(100);
-  gw.present(CHILD_ID_MOTION, S_MOTION);
-  gw.wait(100);
-  gw.present(CHILD_ID_MOISTURE, S_CUSTOM);
-  gw.wait(100);
-  gw.present(CHILD_ID_UV, S_UV);
-  gw.wait(100);
-  gw.present(CHILD_ID_BARO, S_BARO);
-  gw.wait(100);
-  gw.present(CHILD_ID_SOUND, S_POWER);
-  
-
+  metric = getConfig().isMetric;
   dht.setup(HUMIDITY_SENSOR_DIGITAL_PIN);
   bmp.begin();
-
   pinMode(MOTION_SENSOR_DIGITAL_PIN, INPUT);
   pinMode(LIGHT_SENSOR_DIGITAL_PIN, INPUT);
+}
+
+void presentation() {
+  sendSketchInfo(SN, SV);
+  present(CHILD_ID_HUM, S_HUM);
+  present(CHILD_ID_TEMP, S_TEMP);
+  present(CHILD_ID_LIGHT, S_LIGHT_LEVEL);
+  present(CHILD_ID_IS_DARK, S_LIGHT);
+  present(CHILD_ID_MOTION, S_MOTION);
+  present(CHILD_ID_MOISTURE, S_CUSTOM);
+  present(CHILD_ID_UV, S_UV);
+  present(CHILD_ID_BARO, S_BARO);
+  present(CHILD_ID_SOUND, S_POWER);
 }
 
 void loop()
@@ -105,13 +100,13 @@ void loop()
 
   boolean tripped = digitalRead(MOTION_SENSOR_DIGITAL_PIN);
   if (tripped != lastTripped) {
-    gw.send(msgMotion.set(tripped ? "1" : "0")); // Send tripped value to gw
+    send(msgMotion.set(tripped ? "1" : "0")); // Send tripped value to gw
     lastTripped = tripped;
   }
 
   boolean dark = digitalRead(LIGHT_SENSOR_DIGITAL_PIN);
   if (dark != lastDark) {
-    gw.send(msgDark.set(dark ? "0" : "1")); // Send tripped value to gw INVERSE since DARKNESSS MUAHAHHahahahahahahaha
+    send(msgDark.set(dark ? "0" : "1")); // Send tripped value to gw INVERSE since DARKNESSS MUAHAHHahahahahahahaha
     lastDark = dark;
   }
 
@@ -120,14 +115,14 @@ void loop()
 
   int lightLevel = (1023 - analogRead(LIGHT_SENSOR_ANALOG_PIN)) / 10.23;
   if (lightLevel != lastLightLevel) {
-    gw.send(msgLight.set(lightLevel));
+    send(msgLight.set(lightLevel));
     lastLightLevel = lightLevel;
   }
 
   int soundLevel = analogRead(SOUND_SENSOR_ANALOG_PIN);
   //Serial.println(soundLevel);
   if (soundLevel != lastSoundLevel) {
-    gw.send(msgSound.set(soundLevel));
+    send(msgSound.set(soundLevel));
     lastSoundLevel = soundLevel;
   }
 
@@ -139,20 +134,20 @@ void loop()
     if (!metric) {
       temperature = dht.toFahrenheit(temperature);
     }
-    gw.send(msgTemp.set(temperature, 1));
+    send(msgTemp.set(temperature, 1));
   }
 
   float humidity = dht.getHumidity();
   if (isnan(humidity)) {
     Serial.println("Failed reading humidity from DHT");
   } else if (humidity != lastHum) {
-    gw.send(msgHum.set(humidity, 1));
+    send(msgHum.set(humidity, 1));
     lastHum = humidity;
   }
 
   int soilsensorValue = analogRead(SOIL_SENSOR_ANALOG_PIN);
   if (soilsensorValue != lastSoilValue) {
-    gw.send(msgMoisture.set(soilsensorValue));
+    send(msgMoisture.set(soilsensorValue));
     lastSoilValue = soilsensorValue;
   }
   //  }
@@ -166,20 +161,19 @@ void loop()
     }
   }
   if (uvIndex != lastUV) {
-    gw.send(msgUv.set(uvIndex));
+    send(msgUv.set(uvIndex));
     lastUV = uvIndex;
   }
 
   float pressure = bmp.readSealevelPressure(-2) / 100; // -2 meters above sealevel
   if (pressure != lastPressure) {
-    gw.send(msgBaro.set(pressure, 0));
+    send(msgBaro.set(pressure, 0));
     lastPressure = pressure;
   }
 
-  gw.wait(5000);
-  gw.process();
-  //gw.sleep(INTERRUPT, CHANGE, SLEEP_TIME); //sleep a bit
+  //gw.wait(5000);
+  //gw.process();
+  sleep(INTERRUPT, CHANGE, SLEEP_TIME); //sleep a bit
   //gw.sleep(SLEEP_TIME); //sleep a bit
 }
-
 
