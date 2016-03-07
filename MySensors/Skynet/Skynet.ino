@@ -43,7 +43,6 @@
 int uvIndexValue [13] = { 50, 227, 318, 408, 503, 606, 696, 795, 881, 976, 1079, 1170, 3000};
 int uvIndex;
 boolean metric = true;
-
 float lastHum;
 float lastTemp;
 boolean lastTripped = true;
@@ -171,9 +170,5 @@ void loop()
     lastPressure = pressure;
   }
 
-  //gw.wait(5000);
-  //gw.process();
-  sleep(INTERRUPT, CHANGE, SLEEP_TIME); //sleep a bit
-  //gw.sleep(SLEEP_TIME); //sleep a bit
+  smartSleep(INTERRUPT, CHANGE, SLEEP_TIME); //sleep a bit
 }
-
